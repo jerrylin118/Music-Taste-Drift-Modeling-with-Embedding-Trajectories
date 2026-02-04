@@ -6,7 +6,7 @@ A **representation-learning and concept-drift** project that models a user's mus
 
 ## Overview
 
-User preferences in music are non-stationary: tastes evolve over time due to life events, discovery, or mood. This project treats taste as a **trajectory in an embedding space**—each time window yields a summary vector $\mu_{u,t}$ from listened songs—and studies **drift** between consecutive windows to detect change points. We implement multiple drift metrics and two detectors, then validate detection accuracy and robustness under controlled noise (exploration rate) using synthetic user archetypes with known change points.
+User preferences in music are non-stationary: tastes evolve over time due to life events, discovery, or mood. This project treats taste as a **trajectory in an embedding space**—each time window yields a summary vector $\mu\_{u,t}$ from listened songs—and studies **drift** between consecutive windows to detect change points. We implement multiple drift metrics and two detectors, then validate detection accuracy and robustness under controlled noise (exploration rate) using synthetic user archetypes with known change points.
 
 ---
 
@@ -24,10 +24,12 @@ We do not predict next-song or build a recommender; we **represent** taste per w
 
 ## Method
 
+> **Note:** Mathematical formulas use LaTeX (`$...$` and `$$...$$`). For correct rendering, view this README on GitHub or in any viewer with math support (e.g. KaTeX). Some editors’ preview may show raw LaTeX.
+
 ### 1. Song Space
 
 - **Configurable embedding space** of dimension $d$ (default $d = 32$).
-- **Synthetic mode (default)**: $K$ clusters (e.g. genres/moods); each song embedding is sampled from $\mathcal{N}(\mathbf{c}_k, \sigma^2 I)$ around cluster center $\mathbf{c}_k$.
+- **Synthetic mode (default)**: $K$ clusters (e.g. genres/moods); each song embedding is sampled from $\mathcal{N}(\mathbf{c}\_k, \sigma^2 I)$ around cluster center $\mathbf{c}\_k$.
 - **Optional**: load a public CSV of audio features and reduce to $d$ dimensions via standardization + PCA. Not required to run.
 
 A `SongSpace` class provides: sample songs by cluster mixture, return embeddings, and cluster IDs.
@@ -47,26 +49,31 @@ A `SongSpace` class provides: sample songs by cluster mixture, return embeddings
 
 For each user $u$ and window $t$, **taste** is summarized as:
 
-- **Mean embedding**  
+- **Mean embedding**
+
   $$
   \mu_{u,t} = \frac{1}{|L_{u,t}|} \sum_{s \in L_{u,t}} \mathbf{e}_s
-  $$  
-  where $L_{u,t}$ is the set of listened songs in that window and $\mathbf{e}_s$ their embeddings. Optionally an exponentially weighted mean within the window can be used.
-- **Dispersion**: scalar (e.g. mean distance of listens to $\mu_{u,t}$) for interpretability.
+  $$
 
-Implemented in `modeling/taste.py`: listen events → per-user per-window $\mu_{u,t}$ and dispersion.
+  where $L\_{u,t}$ is the set of listened songs in that window and $\mathbf{e}\_s$ their embeddings. Optionally an exponentially weighted mean within the window can be used.
+- **Dispersion**: scalar (e.g. mean distance of listens to $\mu\_{u,t}$) for interpretability.
+
+Implemented in `modeling/taste.py`: listen events → per-user per-window $\mu\_{u,t}$ and dispersion.
 
 ### 4. Drift Metrics (Formulas + Implementation)
 
 Between consecutive windows we compute **drift** for $t = 1, \ldots, T-1$:
 
-1. **Cosine distance**  
+1. **Cosine distance**
+
    $$
    D_{\cos}(\mu_{t}, \mu_{t-1}) = 1 - \frac{\mu_t \cdot \mu_{t-1}}{\|\mu_t\| \|\mu_{t-1}\|}
-   $$  
+   $$
+
    Scale-invariant; 0 when directions align.
 
-2. **Euclidean distance**  
+2. **Euclidean distance**
+
    $$
    D_{\text{euc}}(\mu_t, \mu_{t-1}) = \|\mu_t - \mu_{t-1}\|_2
    $$
@@ -77,7 +84,7 @@ Between consecutive windows we compute **drift** for $t = 1, \ldots, T-1$:
 
 ### 5. Change-Point Detection
 
-- **Threshold detector**: flag change at $t$ if $\text{drift}_t > \theta$ and optionally exceeds a rolling baseline by $k$ standard deviations.
+- **Threshold detector**: flag change at $t$ if $\text{drift}\_t > \theta$ and optionally exceeds a rolling baseline by $k$ standard deviations.
 - **CUSUM-style detector**: accumulates positive deviations above a reference; flag when cumulative sum exceeds a threshold.
 - Interface: `detect_change_points(drift_series, method=..., params=...)` → predicted change points and scores.
 
@@ -103,7 +110,7 @@ Figures are generated under `reports/figures/` after running the pipeline.
 
 ![Drift examples](reports/figures/drift_examples.png)
 
-2. **2D trajectory** (`trajectory_examples.png`): PCA projection of $\mu_{u,t}$ across time; points connected in time order, colored by window; predicted change points marked.
+2. **2D trajectory** (`trajectory_examples.png`): PCA projection of $\mu\_{u,t}$ across time; points connected in time order, colored by window; predicted change points marked.
 
 ![Trajectory examples](reports/figures/trajectory_examples.png)
 
