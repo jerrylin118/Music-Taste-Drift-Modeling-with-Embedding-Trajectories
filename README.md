@@ -51,11 +51,11 @@ For each user $u$ and window $t$, **taste** is summarized as:
 
 - **Mean embedding**
 
-  $$
-  \mu_{u,t} = \frac{1}{|L_{u,t}|} \sum_{s \in L_{u,t}} \mathbf{e}_s
-  $$
+$$
+\mu_{u,t} = \frac{1}{|L_{u,t}|} \sum_{s \in L_{u,t}} \mathbf{e}_s
+$$
 
-  where $L\_{u,t}$ is the set of listened songs in that window and $\mathbf{e}\_s$ their embeddings. Optionally an exponentially weighted mean within the window can be used.
+where $L\_{u,t}$ is the set of listened songs in that window and $\mathbf{e}\_s$ their embeddings. Optionally an exponentially weighted mean within the window can be used.
 - **Dispersion**: scalar (e.g. mean distance of listens to $\mu\_{u,t}$) for interpretability.
 
 Implemented in `modeling/taste.py`: listen events → per-user per-window $\mu\_{u,t}$ and dispersion.
@@ -66,17 +66,17 @@ Between consecutive windows we compute **drift** for $t = 1, \ldots, T-1$:
 
 1. **Cosine distance**
 
-   $$
-   D_{\cos}(\mu_{t}, \mu_{t-1}) = 1 - \frac{\mu_t \cdot \mu_{t-1}}{\|\mu_t\| \|\mu_{t-1}\|}
-   $$
+$$
+D_{\cos}(\mu_{t}, \mu_{t-1}) = 1 - \frac{\mu_t \cdot \mu_{t-1}}{\|\mu_t\| \|\mu_{t-1}\|}
+$$
 
-   Scale-invariant; 0 when directions align.
+Scale-invariant; 0 when directions align.
 
 2. **Euclidean distance**
 
-   $$
-   D_{\text{euc}}(\mu_t, \mu_{t-1}) = \|\mu_t - \mu_{t-1}\|_2
-   $$
+$$
+D_{\text{euc}}(\mu_t, \mu_{t-1}) = \|\mu_t - \mu_{t-1}\|_2
+$$
 
 3. **Gaussian KL proxy**: treat each window’s embeddings as $\mathcal{N}(\mu, \text{diag}(\sigma^2))$; compute a **symmetric KL proxy** between consecutive Gaussians (numerically stable, documented in code).
 
