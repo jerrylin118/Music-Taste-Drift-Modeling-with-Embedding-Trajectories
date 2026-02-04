@@ -81,7 +81,8 @@ def simulate_users(
     ground_truth: List[Dict[str, Any]] = []
 
     for u in range(n_users):
-        arch = rng.choice(archetypes, p=archetype_weights)
+        idx = rng.choice(len(archetypes), p=archetype_weights)
+        arch = archetypes[idx]
         true_cps: List[int] = []
         if arch == UserArchetype.ABRUPT_CHANGE:
             true_cps = [abrupt_change_window]
